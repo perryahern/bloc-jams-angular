@@ -1,5 +1,5 @@
 (function() {
-    function seekBar() {
+    function seekBar($document) {
         /**
         * @function calculatePercent
         * @desc Returns the horizontal percent along the seek bar where the event ($event from view) occurred
@@ -63,11 +63,29 @@
                     var percent = calculatePercent(seekBar, event);
                     scope.value = percent * scope.max;
                 };
+
+                scope.trackThumb = function() {
+                    $document.bind('mousemove.thumb', function(event) {
+                        var percent = calculatePercent(seekBar, event);
+                        scope.$apply(function() {
+                            scope.value = percent * scope.max;
+                        });
+                    });
+
+                    $document.bind('mouseup.thumb', function() {
+                        $document.unbind('mousemove.thumb');
+                        $document.unbind('mouseup.thumb');
+                    });
+                };
+
+                scope.thumbStyle = function() {
+                    return {left: percentString()};
+                };
             }
         };
     }
 
     angular
         .module('blocJams')
-        .directive('seekBar', seekBar);
+        .directive('seekBar', ['$document', seekBar]);
 })();
