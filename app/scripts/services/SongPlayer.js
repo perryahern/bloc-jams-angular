@@ -15,14 +15,23 @@
         var currentBuzzObject = null;
 
         /**
+        * @function stopSong
+        * @desc Stops currently playing song
+        * @param {Object} song
+        */
+        var stopSong = function() {
+            currentBuzzObject.stop();
+            SongPlayer.currentSong.playing = null;
+        };
+
+        /**
         * @function setSong
         * @desc Stops currently playing song and loads new audio file as currentBuzzObject
         * @param {Object} song
         */
         var setSong = function(song) {
             if (currentBuzzObject) {
-                currentBuzzObject.stop();
-                SongPlayer.currentSong.playing = null;
+                stopSong();
             }
 
             currentBuzzObject = new buzz.sound(song.audioUrl, {
@@ -88,8 +97,31 @@
             currentSongIndex--;
 
             if (currentSongIndex < 0) {
-                currentBuzzObject.stop();
-                SongPlayer.currentSong.playing = null;
+                // I added this conditional to handle the error if Previous is the first button clicked after album view loads
+                if (currentSongIndex + 1 === 0) {
+                    stopSong();
+                }
+            } else {
+                /**
+                * @desc Get the song object for the new song
+                * @type {Object}
+                */
+                var song = currentAlbum.songs[currentSongIndex];
+                setSong(song);
+                playSong(song);
+            }
+        };
+
+        SongPlayer.next = function() {
+            /**
+            * @desc Index of the currently playing song
+            * @type {Object}
+            */
+            var currentSongIndex = getSongIndex(SongPlayer.currentSong);
+            currentSongIndex++;
+
+            if (currentSongIndex >= currentAlbum.songs.length) {
+                stopSong();
             } else {
                 /**
                 * @desc Get the song object for the new song
