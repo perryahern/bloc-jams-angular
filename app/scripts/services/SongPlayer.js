@@ -42,6 +42,10 @@
             currentBuzzObject.bind('timeupdate', function() {
                 $rootScope.$apply(function() {
                     SongPlayer.currentTime = currentBuzzObject.getTime();
+                    // Check to see if song is ended; if so, play the next song on the album
+                    if (currentBuzzObject.isEnded()) {
+                        SongPlayer.next();
+                    }
                 });
             });
 
@@ -115,7 +119,7 @@
             currentSongIndex--;
 
             if (currentSongIndex < 0) {
-                // I added this conditional to handle the error if Previous is the first button clicked after album view loads
+                // Handle error if Previous is the first button clicked after album view loads
                 if (currentSongIndex + 1 === 0) {
                     stopSong();
                 }
